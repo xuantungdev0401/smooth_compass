@@ -1,16 +1,16 @@
 part of flutter_sensor_compass;
 
 class _Compass {
-  List<double> _rotationMatrix = List.filled(9, 0.0);
+  final List<double> _rotationMatrix = List.filled(9, 0.0);
   double _azimuth = 0.0;
   double azimuthFix = 0.0;
   final List<_CompassStreamSubscription> _updatesSubscriptions = [];
   StreamSubscription<SensorEvent>? _rotationSensorStream;
-  StreamController<double> _internalUpdateController =
+  final StreamController<double> _internalUpdateController =
       StreamController.broadcast();
 
   /// Starts the compass updates.
-  Stream<CompassModel> compassUpdates(Duration interval, double azimuthFix) {
+  Stream<CompassModel> compassUpdates(Duration? interval, double azimuthFix) {
     this.azimuthFix = azimuthFix;
     // ignore: close_sinks
     StreamController<CompassModel>? compassStreamController;

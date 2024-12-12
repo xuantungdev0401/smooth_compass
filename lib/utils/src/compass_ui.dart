@@ -14,7 +14,7 @@ class SmoothCompass extends StatelessWidget {
   final double? height;
   final double? width;
 
-  const SmoothCompass({Key? key,required this.compassBuilder,this.compassAsset, this.rotationSpeed=200, this.height=200, this.width=200, this.loadingAnimation}) : super(key: key);
+  const SmoothCompass({super.key, required this.compassBuilder, this.compassAsset, this.rotationSpeed=200, this.height=200, this.width=200, this.loadingAnimation});
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +74,7 @@ class SmoothCompass extends StatelessWidget {
 ///default widget if custom widget isn't provided
   Widget _defaultWidget(AsyncSnapshot<CompassModel> snapshot)
   {
+    return const SizedBox();
     return AnimatedRotation(
       turns: snapshot.data!.turns*-1,
       duration: Duration(milliseconds: rotationSpeed!),
@@ -93,7 +94,7 @@ class SmoothCompass extends StatelessWidget {
 
 
 ///calculating compass turn from heading value
-getCompassValues(double heading)
+CompassModel getCompassValues(double heading)
 {
   double direction = heading;
   direction = direction < 0 ? (360 + direction): direction;

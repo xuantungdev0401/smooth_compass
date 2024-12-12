@@ -4,20 +4,23 @@ version: 1.0.2
 homepage: https://github.com/alihadi5125/smooth_compass
 
 environment:
-  sdk: ">=2.17.5 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=2.5.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  flutter_sensors: ^1.0.1
-  vector_math: ^2.1.2
+  flutter_sensors:
+    git:
+      url: https://github.com/xuantungdev0401/flutter_sensors.git
+      ref: main
+  vector_math: ^2.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 
 # For information on the generic Dart part of this file, see the
@@ -27,8 +30,8 @@ dev_dependencies:
 flutter:
 
   # To add assets to your package, add an assets section, like this:
-  assets:
-    - packages/smooth_compass/assets/images/compass.png
+  # assets:
+  #   - packages/smooth_compass/assets/images/compass.png
   #   - images/a_dot_ham.jpeg
   #
   # For details regarding assets in packages, see
