@@ -14,7 +14,7 @@ dependencies:
   flutter_sensors:
     git:
       url: https://github.com/xuantungdev0401/flutter_sensors.git
-      ref: main
+      ref: master
   vector_math: ^2.1.4
 
 dev_dependencies:
