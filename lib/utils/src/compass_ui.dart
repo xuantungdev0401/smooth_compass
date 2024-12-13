@@ -71,7 +71,7 @@ class _SmoothCompassState extends State<SmoothCompass> {
           builder: (context, AsyncSnapshot<CompassModel> snapshot) {
             if (widget.compassAsset == null) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return widget.loadingAnimation!=null? widget.loadingAnimation!: const CircularProgressIndicator();
+                return widget.loadingAnimation ?? const CircularProgressIndicator();
               }
               if (snapshot.hasError) {
                 return SizedBox();
@@ -82,7 +82,7 @@ class _SmoothCompassState extends State<SmoothCompass> {
             }
             else {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return widget.loadingAnimation ?? const CircularProgressIndicator();
               }
               if (snapshot.hasError) {
                 return SizedBox();
