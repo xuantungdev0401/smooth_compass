@@ -1,54 +1,83 @@
 
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../smooth_compass.dart';
 double preValue=0;
 double turns=0;
 ///custom callback for building widget
 typedef WidgetBuilder=Widget Function(BuildContext context,AsyncSnapshot<CompassModel>? compassData,Widget compassAsset);
-class SmoothCompass extends StatelessWidget {
+class SmoothCompass extends StatefulWidget {
   final WidgetBuilder compassBuilder;
   final Widget? compassAsset;
   final Widget? loadingAnimation;
   final int? rotationSpeed;
   final double? height;
   final double? width;
+  final ValueChanged<CompassModel>? onCompassUpdate;
 
-  const SmoothCompass({super.key, required this.compassBuilder, this.compassAsset, this.rotationSpeed=200, this.height=200, this.width=200, this.loadingAnimation});
+  const SmoothCompass({super.key, required this.compassBuilder, this.compassAsset, this.rotationSpeed=200, this.height=200, this.width=200, this.loadingAnimation, this.onCompassUpdate});
+
+  @override
+  State<SmoothCompass> createState() => _SmoothCompassState();
+}
+
+class _SmoothCompassState extends State<SmoothCompass> {
+  StreamController<CompassModel>? _stream;
+  late Future<bool> availableFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    availableFuture = Compass().isCompassAvailable();
+    _stream = Compass().compassUpdates(
+        interval: const Duration(milliseconds: -1,), azimuthFix: 0.0);
+    if (widget.onCompassUpdate != null) {
+      _stream!.stream.listen(onUpdateCompass);
+    }
+  }
+
+  void onUpdateCompass(CompassModel val) {
+    widget.onCompassUpdate?.call(val);
+  }
+
+  @override
+  void dispose() {
+    _stream?.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     /// check if the compass support available
     return FutureBuilder(
-      future: Compass().isCompassAvailable(),
+      future: availableFuture,
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
         if(snapshot.connectionState==ConnectionState.waiting)
           {
-            return loadingAnimation!=null ?loadingAnimation!: const Center(
-              child: CircularProgressIndicator(),
-            );
+            return widget.loadingAnimation != null ? widget.loadingAnimation! : const SizedBox();;
           }
         if(!snapshot.data!)
           {
-            return const Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                    child: Text("Compass support for this device is not available"))
-            );
+            return const SizedBox();
           }
+        if (_stream == null) {
+          return const SizedBox();
+        }
         /// start compass stream
         return StreamBuilder<CompassModel>(
-          stream: Compass().compassUpdates(
-              interval: const Duration(milliseconds: -1,), azimuthFix: 0.0),
+          stream: _stream!.stream,
           builder: (context, AsyncSnapshot<CompassModel> snapshot) {
-            if (compassAsset == null) {
+            if (widget.compassAsset == null) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return loadingAnimation!=null? loadingAnimation!: const CircularProgressIndicator();
+                return widget.loadingAnimation!=null? widget.loadingAnimation!: const CircularProgressIndicator();
               }
               if (snapshot.hasError) {
+                return SizedBox();
                 return Text(snapshot.error.toString());
               }
-              return compassBuilder(
+              return widget.compassBuilder(
                   context, snapshot, _defaultWidget(snapshot));
             }
             else {
@@ -56,12 +85,13 @@ class SmoothCompass extends StatelessWidget {
                 return const CircularProgressIndicator();
               }
               if (snapshot.hasError) {
+                return SizedBox();
                 return Text(snapshot.error.toString());
               }
-              return compassBuilder(context, snapshot, AnimatedRotation(
+              return widget.compassBuilder(context, snapshot, AnimatedRotation(
                 turns: snapshot.data!.turns * -1,
-                duration: Duration(milliseconds: rotationSpeed!),
-                child: compassAsset!,
+                duration: Duration(milliseconds: widget.rotationSpeed!),
+                child: widget.compassAsset!,
               ),
               );
             }
@@ -71,16 +101,17 @@ class SmoothCompass extends StatelessWidget {
 
     );
   }
+
 ///default widget if custom widget isn't provided
   Widget _defaultWidget(AsyncSnapshot<CompassModel> snapshot)
   {
     return const SizedBox();
     return AnimatedRotation(
       turns: snapshot.data!.turns*-1,
-      duration: Duration(milliseconds: rotationSpeed!),
+      duration: Duration(milliseconds: widget.rotationSpeed!),
       child: Container(
-        height: height,
-        width: width,
+        height: widget.height,
+        width: widget.width,
         decoration:  const BoxDecoration(
             image: DecorationImage(
                 image: AssetImage('assets/images/compass.png', package: 'smooth_compass'),

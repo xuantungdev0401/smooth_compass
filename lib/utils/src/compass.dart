@@ -10,7 +10,7 @@ class _Compass {
       StreamController.broadcast();
 
   /// Starts the compass updates.
-  Stream<CompassModel> compassUpdates(Duration? interval, double azimuthFix) {
+  StreamController<CompassModel> compassUpdates(Duration? interval, double azimuthFix) {
     this.azimuthFix = azimuthFix;
     // ignore: close_sinks
     StreamController<CompassModel>? compassStreamController;
@@ -47,7 +47,7 @@ class _Compass {
         if (_updatesSubscriptions.isEmpty) _stopSensor();
       },
     );
-    return compassStreamController.stream;
+    return compassStreamController;
   }
 
   /// Checks if the rotation sensor is available in the system.
